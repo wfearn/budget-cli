@@ -26,7 +26,15 @@ class Transaction(TransactionObject):
     def __init__(self, *args, **kwargs) -> None:
         attribute_names_and_classes = Transaction._get_input_data_format()
 
-        if kwargs or len(args) != len(attribute_names_and_classes):
+        print('Args Len:', len(args))
+        print('Attrs Length:', len(attribute_names_and_classes))
+        if (
+            kwargs
+            or (
+                len(args) != len(attribute_names_and_classes)
+                and len(args) != len(attribute_names_and_classes[:5])
+            )
+        ):
             raise InvalidTransactionError
 
         for i, arg in enumerate(args):
@@ -34,20 +42,22 @@ class Transaction(TransactionObject):
             _property = data_class(arg)
             self._set_property(property_name, _property)
 
-        self._set_transaction_id(self.amount)
-        self._set_transaction_id(self.sub_amount)
+        if not hasattr(self, 'transaction_id'):
+            self.transaction_id = self._calculate_transaction_hash(self.amount)
 
-    def _set_transaction_id(self, amount: float):
+        if not hasattr(self, 'sub_transaction_id'):
+            self.sub_transaction_id = \
+                self._calculate_transaction_hash(self.sub_amount)
+
+        if not hasattr(self, 'human_verified'):
+            self.human_verified = 0
+
+        if not hasattr(self, 'category'):
+            self.category = 'NONE'
+
+    def _calculate_transaction_hash(self, amount: float):
         hash_string = f'{self.date}{self.description}{amount}{self.bank}'
-
-        if amount == self.amount and not hasattr(self, 'transaction_id'):
-            self.transaction_id = hashlib.sha256(hash_string.encode()).hexdigest()
-
-        elif amount == self.sub_amount:
-            self.sub_transaction_id = hashlib.sha256(hash_string.encode()).hexdigest()
-
-        else:
-            raise InvalidTransactionError
+        return hashlib.sha256(hash_string.encode()).hexdigest()
 
     def _set_property(
         self,
@@ -68,6 +78,10 @@ class Transaction(TransactionObject):
             self.category = _property
         elif property_name == 'human_verified':
             self.human_verified = _property
+        elif property_name == 'transaction_id':
+            self.transaction_id = _property
+        elif property_name == 'sub_transaction_id':
+            self.sub_transaction_id = _property
         else:
             raise InvalidTransactionError
 
@@ -79,6 +93,8 @@ class Transaction(TransactionObject):
             ('amount', float),
             ('sub_amount', float),
             ('bank', str),
+            ('transaction_id', str),
+            ('sub_transaction_id', str),
             ('category', str),
             ('human_verified', int)
         ]

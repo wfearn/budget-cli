@@ -1,7 +1,7 @@
 from pybudget.storage import Transaction, SqliteManager
 
-test_db_name = 'test.db'
 
+test_db_name = 'test.db'
 test_data = [
     '2000-01-01',
     'Transaction',
@@ -43,7 +43,3 @@ class TestSqliteManager:
 
     def test_exists_returns_false_if_data_not_in_db(self):
         raise NotImplementedError
-
-class TestTransaction:
-
-
