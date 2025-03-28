@@ -1,2 +1,3 @@
 from .file import FileManager
-from .manager import Transaction, InvalidTransactionError
+from .manager import InvalidTransactionError
+from .database import Transaction
