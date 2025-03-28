@@ -26,8 +26,6 @@ class Transaction(TransactionObject):
     def __init__(self, *args, **kwargs) -> None:
         attribute_names_and_classes = Transaction._get_input_data_format()
 
-        print('Args Len:', len(args))
-        print('Attrs Length:', len(attribute_names_and_classes))
         if (
             kwargs
             or (
